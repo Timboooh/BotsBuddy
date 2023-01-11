@@ -1,59 +1,62 @@
 #include <Arduino.h>
-#include <Adafruit_LSM6DSOX.h>
+#include <Adafruit_LSM6DSO32.h>
 
 #include "accel.hpp"
 
-#define LSM_CS 10
-#define LSM_SCK 13
-#define LSM_MISO 12
-#define LSM_MOSI 11
+uint8_t intGPIO_PIN = 0; // "D3"
 
-Adafruit_LSM6DSOX sox;
+Adafruit_LSM6DSO32 dso32;
 
 namespace ACCEL
 {
+    void IRAM_ATTR intTest()
+    {
+        Serial.println("interrupt!");
+    }
+
     void setup()
     {
-        delay(10000);
+        delay(2000);
+        attachInterrupt(digitalPinToInterrupt(intGPIO_PIN), intTest, RISING);
         while (!Serial)
             delay(10); // will pause Zero, Leonardo, etc until serial console opens
 
-        Serial.println("Adafruit LSM6DSOX test!");
+        Serial.println("Adafruit LSM6DSO32 test!");
 
-        if (!sox.begin_I2C())
+        if (!dso32.begin_I2C())
         {
-            // if (!sox.begin_SPI(LSM_CS)) {
-            // if (!sox.begin_SPI(LSM_CS, LSM_SCK, LSM_MISO, LSM_MOSI)) {
-            // Serial.println("Failed to find LSM6DSOX chip");
+            // if (!dso32.begin_SPI(LSM_CS)) {
+            // if (!dso32.begin_SPI(LSM_CS, LSM_SCK, LSM_MISO, LSM_MOSI)) {
+            // Serial.println("Failed to find LSM6DSO32 chip");
             while (1)
             {
                 delay(10);
             }
         }
 
-        Serial.println("LSM6DSOX Found!");
+        Serial.println("LSM6DSO32 Found!");
 
-        sox.setAccelRange(LSM6DS_ACCEL_RANGE_16_G);
+        dso32.setAccelRange(LSM6DSO32_ACCEL_RANGE_32_G);
         Serial.print("Accelerometer range set to: ");
-        switch (sox.getAccelRange())
+        switch (dso32.getAccelRange())
         {
-        case LSM6DS_ACCEL_RANGE_2_G:
-            Serial.println("+-2G");
-            break;
-        case LSM6DS_ACCEL_RANGE_4_G:
+        case LSM6DSO32_ACCEL_RANGE_4_G:
             Serial.println("+-4G");
             break;
-        case LSM6DS_ACCEL_RANGE_8_G:
+        case LSM6DSO32_ACCEL_RANGE_8_G:
             Serial.println("+-8G");
             break;
-        case LSM6DS_ACCEL_RANGE_16_G:
+        case LSM6DSO32_ACCEL_RANGE_16_G:
             Serial.println("+-16G");
+            break;
+        case LSM6DSO32_ACCEL_RANGE_32_G:
+            Serial.println("+-32G");
             break;
         }
 
-        // sox.setGyroRange(LSM6DS_GYRO_RANGE_250_DPS );
+        // dso32.setGyroRange(LSM6DS_GYRO_RANGE_250_DPS );
         Serial.print("Gyro range set to: ");
-        switch (sox.getGyroRange())
+        switch (dso32.getGyroRange())
         {
         case LSM6DS_GYRO_RANGE_125_DPS:
             Serial.println("125 degrees/s");
@@ -71,12 +74,12 @@ namespace ACCEL
             Serial.println("2000 degrees/s");
             break;
         case ISM330DHCX_GYRO_RANGE_4000_DPS:
-            break; // unsupported range for the DSOX
+            break; // unsupported range for the DSO32
         }
 
-        // sox.setAccelDataRate(LSM6DS_RATE_12_5_HZ);
+        // dso32.setAccelDataRate(LSM6DS_RATE_12_5_HZ);
         Serial.print("Accelerometer data rate set to: ");
-        switch (sox.getAccelDataRate())
+        switch (dso32.getAccelDataRate())
         {
         case LSM6DS_RATE_SHUTDOWN:
             Serial.println("0 Hz");
@@ -113,9 +116,9 @@ namespace ACCEL
             break;
         }
 
-        //sox.setGyroDataRate(LSM6DS_RATE_12_5_HZ);
+        // dso32.setGyroDataRate(LSM6DS_RATE_12_5_HZ);
         Serial.print("Gyro data rate set to: ");
-        switch (sox.getGyroDataRate())
+        switch (dso32.getGyroDataRate())
         {
         case LSM6DS_RATE_SHUTDOWN:
             Serial.println("0 Hz");
@@ -151,28 +154,40 @@ namespace ACCEL
             Serial.println("6.66 KHz");
             break;
         }
+        dso32.configInt1(false, false, true);
     }
 
     void update()
     {
+
         //  /* Get a new normalized sensor event */
         sensors_event_t accel;
         sensors_event_t gyro;
         sensors_event_t temp;
-        sox.getEvent(&accel, &gyro, &temp);
+        dso32.getEvent(&accel, &gyro, &temp);
 
         Serial.print("\t\tTemperature ");
         Serial.print(temp.temperature);
         Serial.println(" deg C");
 
+        float accelX = accel.acceleration.x;
+        float accelY = accel.acceleration.y;
+        float accelZ = accel.acceleration.z;
+        float gravity = 9.81;
+
+        double gForce = sqrt((accelX*accelX)+(accelY*accelY)+(accelZ*accelZ))/gravity;
+        
         /* Display the results (acceleration is measured in m/s^2) */
         Serial.print("\t\tAccel X: ");
-        Serial.print(accel.acceleration.x);
+        Serial.print(accelX);
         Serial.print(" \tY: ");
-        Serial.print(accel.acceleration.y);
+        Serial.print(accelY);
         Serial.print(" \tZ: ");
-        Serial.print(accel.acceleration.z);
+        Serial.print(accelZ);
         Serial.println(" m/s^2 ");
+
+        Serial.print("\t\tG-force: ");
+        Serial.println(gForce);
 
         /* Display the results (rotation is measured in rad/s) */
         Serial.print("\t\tGyro X: ");

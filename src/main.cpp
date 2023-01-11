@@ -7,11 +7,12 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   ACCEL::setup();
+  Serial.println("setup done");
 }
 
 void loop() {
     long now = millis();
-    if (now - lastUpdate > 2000)
+    if (now - lastUpdate > 200)
     {
         lastUpdate = now;
         ACCEL::update();

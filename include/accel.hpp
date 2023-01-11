@@ -1,7 +1,7 @@
 #ifndef ACCEL_H
 #define ACCEL_H
 
-#include <Adafruit_LSM6DSOX.h>
+#include <Adafruit_LSM6DSO32.h>
 
 namespace ACCEL
 {
