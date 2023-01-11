@@ -4,12 +4,14 @@
 #include "accel.hpp"
 
 uint8_t intGPIO_PIN = 0; // "D3"
+bool trigger = false;
+int threshold = 3;
 
 Adafruit_LSM6DSO32 dso32;
 
 namespace ACCEL
 {
-    void IRAM_ATTR intTest()
+    void intTest()
     {
         Serial.println("interrupt!");
     }
@@ -17,7 +19,6 @@ namespace ACCEL
     void setup()
     {
         delay(2000);
-        attachInterrupt(digitalPinToInterrupt(intGPIO_PIN), intTest, RISING);
         while (!Serial)
             delay(10); // will pause Zero, Leonardo, etc until serial console opens
 
@@ -166,9 +167,9 @@ namespace ACCEL
         sensors_event_t temp;
         dso32.getEvent(&accel, &gyro, &temp);
 
-        Serial.print("\t\tTemperature ");
-        Serial.print(temp.temperature);
-        Serial.println(" deg C");
+        // Serial.print("\t\tTemperature ");
+        // Serial.print(temp.temperature);
+        // Serial.println(" deg C");
 
         float accelX = accel.acceleration.x;
         float accelY = accel.acceleration.y;
@@ -177,6 +178,12 @@ namespace ACCEL
 
         double gForce = sqrt((accelX*accelX)+(accelY*accelY)+(accelZ*accelZ))/gravity;
         
+        if(gForce > threshold){
+            trigger = true;  
+        } else {
+            trigger = false;
+        }
+
         /* Display the results (acceleration is measured in m/s^2) */
         Serial.print("\t\tAccel X: ");
         Serial.print(accelX);
@@ -190,14 +197,14 @@ namespace ACCEL
         Serial.println(gForce);
 
         /* Display the results (rotation is measured in rad/s) */
-        Serial.print("\t\tGyro X: ");
-        Serial.print(gyro.gyro.x);
-        Serial.print(" \tY: ");
-        Serial.print(gyro.gyro.y);
-        Serial.print(" \tZ: ");
-        Serial.print(gyro.gyro.z);
-        Serial.println(" radians/s ");
-        Serial.println();
+        // Serial.print("\t\tGyro X: ");
+        // Serial.print(gyro.gyro.x);
+        // Serial.print(" \tY: ");
+        // Serial.print(gyro.gyro.y);
+        // Serial.print(" \tZ: ");
+        // Serial.print(gyro.gyro.z);
+        // Serial.println(" radians/s ");
+        // Serial.println();
 
         //  // serial plotter friendly format
 

@@ -3,6 +3,8 @@
 
 #include <Adafruit_LSM6DSO32.h>
 
+extern bool trigger;
+
 namespace ACCEL
 {
     void setup();

@@ -12,9 +12,10 @@ void setup() {
 
 void loop() {
     long now = millis();
-    if (now - lastUpdate > 200)
+    if (now - lastUpdate > 10)
     {
         lastUpdate = now;
         ACCEL::update();
+        Serial.println(trigger);
     }
 }
