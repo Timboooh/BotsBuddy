@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define RESPONSE_BUF_CMD_SIZE 8
+#define RESPONSE_BUF_CMD_SIZE 16
 #define RESPONSE_BUF_ARGS_SIZE 64
 namespace A9G
 {
@@ -13,41 +13,35 @@ namespace A9G
         int args_size;
     };
 
-    void sendCommand(const String &command)
-    {
-        while (!Serial2.availableForWrite())
-        { /* wait until we can write*/
-        }
-        Serial2.println("AT+" + command);
-        Serial2.flush();
-        delay(5); // tiny delay to allow the A9G to process the command
-    }
+    bool is_initialized = false;
 
-    template <typename T>
-    String getString(T arg)
+    void sendCommand(const char *fmt, ...)
     {
-        if (std::is_same(arg, bool)::value) {
-            return "bool";
-        } else if (std::is_same(arg, int)::value) {
-            return "int";
-        } else if (std::is_same(arg, String)::value) {
-            return "String";
-        } 
-        return "";
-    }
+        char s[256];
+        va_list arg;
 
-    template <typename T, typename U, typename V, typename W>
-    void sendCommand_2(const String &command, T arg1, U arg2, V arg3)
-    {
-        Serial.printf("arg1: %s\n", getString(arg1));
-        Serial.printf("arg2: %s\n", getString(arg2));
-        Serial.printf("arg3: %s\n", getString(arg3));
+        va_start(arg, fmt);
+        vsprintf(s, fmt, arg);
+
+        Serial2.print(s);
+        Serial2.println();
+
+        Serial.println("Sent AT command:");
+        Serial.print("\t ");
+        Serial.print(s);
+        Serial.println();
+
+        va_end(arg);
+
+        delay(5);
     }
 
     void parseCommand(struct Response response)
     {
-        Serial.println("Got response!");
+        Serial.println("Got response: ");
+        Serial.print("  cmd:\t ");
         Serial.println(response.cmd);
+        Serial.print("  args:\t ");
         Serial.println(response.args);
     }
 
@@ -57,16 +51,20 @@ namespace A9G
         // And uses a baudrate of 115200
         Serial2.begin(115200);
 
-        sendCommand_2("yo", "a", 1, false);
-
-        sendCommand("RST=1");
+        reset();
     }
 
     void post_setup()
     {
         Serial.println("A9G Ready");
-        sendCommand("GPS=1");
-        sendCommand("GPNT=1");
+
+        gps_enable(true);
+        status_indication_mode(1);
+
+        gsm_init();
+        sim_update();
+
+        is_initialized = true;
     }
 
     long lastUpdate = 0;
@@ -76,13 +74,14 @@ namespace A9G
 
         // Ask the time every 5 seconds
         long now = millis();
-        if (now - lastUpdate > 5000)
+        if (is_initialized && now - lastUpdate > 5000)
         {
             lastUpdate = now;
 
-            sendCommand("GPS?");
+            gps_update();
         }
 
+        // Parse the UART data coming back from the A9g
         while (Serial2.available())
         {
             // Start with reading entire lines at once
@@ -90,6 +89,8 @@ namespace A9G
             // This defaults to 1000ms.
             String rx = Serial2.readStringUntil('\n');
             rx.trim(); // get rid of messy spaces or carriage returns
+
+            // Serial.println("A9G: " + rx);
 
             // Some settings need to be set after the A9G has fully initialized.
             // We wait until the A9G reports ready and call the post_setup
@@ -115,4 +116,23 @@ namespace A9G
             }
         }
     }
+
+    void reset() { sendCommand("AT+RST=1"); }
+    void status_indication_mode(int mode) { sendCommand("AT+GPNT=%d", mode); }
+    void gps_enable(bool enable) { sendCommand("AT+GPS=%d", enable); }
+    void gps_update() { sendCommand("AT+LOCATION=2"); }
+    void time_update() { sendCommand("AT+CCLK?"); }
+    void gsm_init()
+    {
+        sendCommand("AT+CMGF=1");
+        sendCommand("AT+CSMP=17,167,0,0");
+    }
+    void sms_send(const char *phonenumber, const char *message)
+    {
+        sendCommand("AT+CMGS=\"%s\"", phonenumber);
+        sendCommand("%s%c", message, 26);
+    }
+    void call_send(const char *phonenumber) { sendCommand("ATD%s", phonenumber); }
+    void sim_update() { sendCommand("AT+CPIN?"); }
+
 } // namespace A9G
