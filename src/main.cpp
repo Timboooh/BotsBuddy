@@ -15,15 +15,13 @@ void setup() {
 
 void loop() {
     long now = millis();
-    if (now - lastUpdate > 1000)
+    if (trigger == true)
     {
-        lastUpdate = now;
-        //ACCEL::update();
-        OLED::startCountdown();
-    if (now - lastUpdate > 10)
-    {
-        lastUpdate = now;
-        ACCEL::update();
-        Serial.println(trigger);
+        if(now - lastUpdate > 1000){
+            lastUpdate = now;
+            OLED::startCountdown();
+        }
     }
-}
+    ACCEL::update();
+    Serial.println(trigger);
+}   
