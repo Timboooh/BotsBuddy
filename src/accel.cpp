@@ -3,7 +3,6 @@
 
 #include "accel.hpp"
 
-uint8_t intGPIO_PIN = 0; // "D3"
 bool trigger = false;
 int threshold = 3;
 
@@ -11,11 +10,6 @@ Adafruit_LSM6DSO32 dso32;
 
 namespace ACCEL
 {
-    void intTest()
-    {
-        Serial.println("interrupt!");
-    }
-
     void setup()
     {
         delay(2000);

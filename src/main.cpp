@@ -22,6 +22,8 @@ void loop() {
             OLED::startCountdown();
         }
     }
+    //TODO reset timer on buttonPress
+    //TODO set trigger to false on buttonPress
     ACCEL::update();
     Serial.println(trigger);
 }   
