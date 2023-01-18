@@ -8,8 +8,9 @@ int counter = 21;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  //ACCEL::setup();
   OLED::setup();
+  ACCEL::setup();
+  Serial.println("setup done");
 }
 
 void loop() {
@@ -19,5 +20,10 @@ void loop() {
         lastUpdate = now;
         //ACCEL::update();
         OLED::startCountdown();
+    if (now - lastUpdate > 10)
+    {
+        lastUpdate = now;
+        ACCEL::update();
+        Serial.println(trigger);
     }
 }
