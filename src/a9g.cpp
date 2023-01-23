@@ -3,17 +3,17 @@
 #include <Arduino.h>
 
 #define RESPONSE_BUF_CMD_SIZE 16
-#define RESPONSE_BUF_ARGS_SIZE 64
+#define RESPONSE_BUF_ARGS_SIZE 256
 namespace A9G
 {
     struct Response
     {
         char cmd[RESPONSE_BUF_CMD_SIZE];
         char args[RESPONSE_BUF_ARGS_SIZE];
-        int args_size;
     };
 
     bool is_initialized = false;
+    bool gps_hasfix = false;
 
     void sendCommand(const char *fmt, ...)
     {
@@ -26,14 +26,14 @@ namespace A9G
         Serial2.print(s);
         Serial2.println();
 
-        Serial.println("Sent AT command:");
-        Serial.print("\t ");
-        Serial.print(s);
-        Serial.println();
+        // Serial.println("Sent AT command:");
+        // Serial.print("\t ");
+        // Serial.print(s);
+        // Serial.println();
 
         va_end(arg);
 
-        delay(5);
+        delay(50);
     }
 
     void parseCommand(struct Response response)
@@ -43,6 +43,14 @@ namespace A9G
         Serial.println(response.cmd);
         Serial.print("  args:\t ");
         Serial.println(response.args);
+
+        if (!strcmp(response.cmd, "LOCATION"))
+            gps_hasfix = strcmp(response.args, "GPS NOT FIX NOW");
+
+        if (!strcmp(response.cmd, "GNRMC"))
+        {
+            
+        }
     }
 
     void setup()
@@ -64,7 +72,7 @@ namespace A9G
         gsm_init();
         sim_update();
 
-        gps_update_interval(5);
+        gps_update_interval(10);
 
         is_initialized = true;
     }
@@ -79,8 +87,6 @@ namespace A9G
         if (is_initialized && now - lastUpdate > 5000)
         {
             lastUpdate = now;
-
-            
         }
 
         // Parse the UART data coming back from the A9g
@@ -102,12 +108,16 @@ namespace A9G
             // Every command response starts with: '+'.
             // And separates the command and return arguments with ": "
             // Example: +CCLK: "23/01/13,12:17:55+01"
-            if (rx.charAt(0) == '+')
+            if (rx.charAt(0) == '+' || rx.charAt(0) == '$')
             {
                 struct Response response;
 
                 // Find index of the command / argument separator
-                int _divLocation = rx.indexOf(':');
+                int _divLocation = 0;
+                if (rx.charAt(0) == '+')
+                    _divLocation = rx.indexOf(':');
+                else if (rx.charAt(0) == '$')
+                    _divLocation = rx.indexOf(',');
 
                 // Parse the full received string into the command and args
                 rx.toCharArray(response.cmd, min(_divLocation, RESPONSE_BUF_CMD_SIZE), 1); // Get the cmd
