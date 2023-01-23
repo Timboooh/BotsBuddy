@@ -1,10 +1,28 @@
 #ifndef A9G_H
 #define A9G_H
 
+#include <Arduino.h>
+
 namespace A9G
 {
     void setup();
     void update();
+
+    /**
+     * true if gps has a sattelite fix
+     * 
+     * @return true gps has fix
+     * @return false gps has no fix
+     */
+    bool gps_getHasfix();
+
+    /**
+     * Get the url of the current location
+     * Gives last known location if no fix is available
+     * 
+     * @return String google maps url of last known location
+     */
+    String gps_getLocationURL();
 
     /**
      * Soft reset the A9G chip

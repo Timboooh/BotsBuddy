@@ -15,6 +15,8 @@ namespace A9G
     bool is_initialized = false;
     bool gps_hasfix = false;
 
+    String location = "";
+
     void sendCommand(const char *fmt, ...)
     {
         char s[256];
@@ -38,18 +40,23 @@ namespace A9G
 
     void parseCommand(struct Response response)
     {
-        Serial.println("Got response: ");
-        Serial.print("  cmd:\t ");
-        Serial.println(response.cmd);
-        Serial.print("  args:\t ");
-        Serial.println(response.args);
+        // Serial.println("Got response: ");
+        // Serial.print("  cmd:\t ");
+        // Serial.println(response.cmd);
+        // Serial.print("  args:\t ");
+        // Serial.println(response.args);
 
-        if (!strcmp(response.cmd, "LOCATION"))
-            gps_hasfix = strcmp(response.args, "GPS NOT FIX NOW");
+        if (!strcmp(response.cmd, "GPSRD"))
+        {   // $GNGGA,000025.029,5133.4337,N,00431.0019,E,0,0,,6.2,M,47.2,M,,*5D
+            String args = response.args;
+            auto latitudeStr = args.substring(18, 20) + " " + args.substring(20, 27);
+            auto longitudeStr = args.substring(30, 33) + " " + args.substring(33, 40);
+            gps_hasfix = (args.charAt(43) != '0');
 
-        if (!strcmp(response.cmd, "GNRMC"))
-        {
-            
+            location = "https://www.google.com/maps/place/" + latitudeStr + ", " + longitudeStr;
+            Serial.println("Location: " + location);
+            Serial.printf("Has Fix: %d\r\n\r\n", gps_hasfix);
+
         }
     }
 
@@ -128,6 +135,9 @@ namespace A9G
             }
         }
     }
+
+    bool gps_getHasfix() { return gps_hasfix; }
+    String gps_getLocationURL() { return location; }
 
     void reset() { sendCommand("AT+RST=1"); }
     void status_indication_mode(int mode) { sendCommand("AT+GPNT=%d", mode); }
