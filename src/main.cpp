@@ -17,13 +17,17 @@ void loop() {
     long now = millis();
     if (trigger == true)
     {
-        if(now - lastUpdate > 1000){
-            lastUpdate = now;
-            OLED::startCountdown();
+        if(OLED::buttonPress() == false){
+            if(now - lastUpdate > 1000){
+                lastUpdate = now;
+                OLED::startCountdown();
+            }
+        } else {
+            counter = 21;
+            trigger = false;
         }
+    } else {
+        ACCEL::update();
+        Serial.println(trigger);   
     }
-    //TODO reset timer on buttonPress
-    //TODO set trigger to false on buttonPress
-    ACCEL::update();
-    Serial.println(trigger);
 }   
