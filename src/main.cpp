@@ -11,12 +11,9 @@ void setup()
   A9G::setup();
 }
 
-void loop() {
-  
-  A9G::update();
-
 void loop()
 {
   // Serial.println(CONTACTS::getNextContact());
   A9G::update();
   delay(100);
+}
