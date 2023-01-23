@@ -64,6 +64,8 @@ namespace A9G
         gsm_init();
         sim_update();
 
+        gps_update_interval(5);
+
         is_initialized = true;
     }
 
@@ -78,7 +80,7 @@ namespace A9G
         {
             lastUpdate = now;
 
-            gps_update();
+            
         }
 
         // Parse the UART data coming back from the A9g
@@ -109,7 +111,7 @@ namespace A9G
 
                 // Parse the full received string into the command and args
                 rx.toCharArray(response.cmd, min(_divLocation, RESPONSE_BUF_CMD_SIZE), 1); // Get the cmd
-                rx.toCharArray(response.args, RESPONSE_BUF_ARGS_SIZE, _divLocation + 2);   // Get the args
+                rx.toCharArray(response.args, RESPONSE_BUF_ARGS_SIZE, _divLocation + 1);   // Get the args
 
                 // Pass the response to the parser so we can actually do something with it.
                 parseCommand(response);
@@ -120,7 +122,7 @@ namespace A9G
     void reset() { sendCommand("AT+RST=1"); }
     void status_indication_mode(int mode) { sendCommand("AT+GPNT=%d", mode); }
     void gps_enable(bool enable) { sendCommand("AT+GPS=%d", enable); }
-    void gps_update() { sendCommand("AT+LOCATION=2"); }
+    void gps_update_interval(int interval_sec) { sendCommand("AT+GPSRD=%d", interval_sec); }
     void time_update() { sendCommand("AT+CCLK?"); }
     void gsm_init()
     {

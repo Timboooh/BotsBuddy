@@ -31,10 +31,11 @@ namespace A9G
     void gps_enable(bool enable);
 
     /**
-     * Update the fix status of the GPS.
-     * If the GPS has a fix, update the coordinate data
+     * Update the location every n seconds
+     * 
+     * @param interval_sec time in seconds between every update
     */
-    void gps_update();
+    void gps_update_interval(int interval_sec);
 
     /**
      * Update the local clock based on the GSM time from the A9g.
