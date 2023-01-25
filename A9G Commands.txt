@@ -1,0 +1,26 @@
+// SYSTEM
+AT+CCLK?                    //Get current time
+AT+RST=1                    //Software reset
+
+// SMS
+AT+CPMS="SM","SM","SM"      //Set message storage unit
+AT+CMGF=0/1                 //Set format, 1 for txt, 0 for pud
+AT+CMGR=x                   //Read message content, x for the serial number of the message
+AT+CMGL=4/"ALL"             //Check message list, if it is PUD format, send AT+CMGL=4, if txt, send AT+CMGL="ALL"
+AT+CMGD=1                   //Delete message. If AT+CMGD=1,4 , delete all messages.
+
+// GPS
+AT+GPS=1 //Turn on GPS
+AT+GPS=0 //Turn off GPS
+AT+GPS? //Check GPS status
+AT+GPSRD=N， //N is a number, represents a NEMA message is output from AT serial every N seconds
+AT+LOCATION=X //X=1 get base station address, X=2 get GPS address
+AT+GPSLP=0 //Normal mode ---- The current is tested to be about 0.063A
+AT+GPSLP=1 //Serial port Low power mode
+AT+GPSLP=2 //GPS Low power mode ---- The current is tested to be about 0.034A
+
+// AGPS
+AT+AGPS=1, turn on AGPS, meanwhile it will turn on GPS. Turn off GPS first when using this function.
+AT+AGPS=0, Turn off AGPS，
+AT+AGPS? , Check AGPS status
+AT+GPSRD=N，N represents output a NEMA message from AT serial every N seconds

@@ -1,4 +1,5 @@
 #include <Arduino.h>
+
 #include "accel.hpp"
 #include "oled.hpp"
 
