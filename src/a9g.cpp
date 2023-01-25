@@ -26,6 +26,7 @@ namespace A9G
         vsprintf(s, fmt, arg);
 
         Serial2.print(s);
+        
         Serial2.println();
 
         // Serial.println("Sent AT command:");
@@ -136,6 +137,7 @@ namespace A9G
         }
     }
 
+    bool is_init() {return is_initialized; }
     bool gps_getHasfix() { return gps_hasfix; }
     String gps_getLocationURL() { return location; }
 
@@ -149,10 +151,13 @@ namespace A9G
         sendCommand("AT+CMGF=1");
         sendCommand("AT+CSMP=17,167,0,0");
     }
-    void sms_send(const char *phonenumber, const char *message)
+    void sms_send(const char *phonenumber, String message)
     {
-        sendCommand("AT+CMGS=\"%s\"", phonenumber);
-        sendCommand("%s%c", message, 26);
+        Serial.println("Fake SMS has been sent!");
+        Serial.println(message);
+
+        // sendCommand("AT+CMGS=\"%s\"", phonenumber);
+        // sendCommand("%s%c", message, 26);
     }
     void call_send(const char *phonenumber) { sendCommand("ATD%s", phonenumber); }
     void sim_update() { sendCommand("AT+CPIN?"); }

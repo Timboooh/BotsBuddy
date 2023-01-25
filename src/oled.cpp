@@ -15,36 +15,56 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 unsigned long previousMillis = 0;
 unsigned long interval = 1000;
 
+int counter = 0;
+
 namespace OLED
 {
-    void setup() {
+    void setup()
+    {
         pinMode(LED_BUILTIN, OUTPUT);
 
-        if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+        if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
+        { // Address 0x3D for 128x64
             Serial.println(F("SSD1306 allocation failed"));
-            for (;;);
+            for (;;)
+                ;
         }
-        delay(2000);
+
         display.clearDisplay();
-        display.setTextSize(6);
+        display.setTextSize(5);
         display.setTextColor(WHITE);
         display.setCursor(0, 10);
-        display.println("GO");
+        display.println("INIT");
         display.display();
     }
 
-
-
-    void update(){
-        if(counter > 0){
-            digitalWrite(LED_BUILTIN, LOW);
-            display.clearDisplay();
-            display.setCursor(5, 5);
-            counter--;
-            display.println(counter);
-            display.display();
-            Serial.println(counter);
-            digitalWrite(LED_BUILTIN, HIGH);
+    long lastUpdate = 0;
+    void update()
+    {
+        long now = millis();
+        if (now - lastUpdate > interval)
+        {
+            if (counter > 0)
+            {
+                lastUpdate = now;
+                digitalWrite(LED_BUILTIN, LOW);
+                display.clearDisplay();
+                display.setCursor(5, 5);
+                counter--;
+                display.println(counter);
+                display.display();
+                Serial.println(counter);
+                digitalWrite(LED_BUILTIN, HIGH);
+            }
+            else
+            {
+                display.clearDisplay();
+                display.setTextSize(6);
+                display.setTextColor(WHITE);
+                display.setCursor(0, 10);
+                display.println("RDY");
+                display.display();
+            }
         }
     }
 }

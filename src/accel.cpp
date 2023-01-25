@@ -12,17 +12,15 @@ namespace ACCEL
 {
     void setup()
     {
-        delay(2000);
-        while (!Serial)
-            delay(10); // will pause Zero, Leonardo, etc until serial console opens
 
-        Serial.println("Adafruit LSM6DSO32 test!");
+        Serial.println("Adafruit LSM6DSO32 init");
 
         if (!dso32.begin_I2C())
         {
             // if (!dso32.begin_SPI(LSM_CS)) {
             // if (!dso32.begin_SPI(LSM_CS, LSM_SCK, LSM_MISO, LSM_MOSI)) {
-            // Serial.println("Failed to find LSM6DSO32 chip");
+            Serial.println("Failed to find LSM6DSO32 chip");
+
             while (1)
             {
                 delay(10);
@@ -170,25 +168,28 @@ namespace ACCEL
         float accelZ = accel.acceleration.z;
         float gravity = 9.81;
 
-        double gForce = sqrt((accelX*accelX)+(accelY*accelY)+(accelZ*accelZ))/gravity;
-        
-        if(gForce > threshold){
-            trigger = true;  
-        } else {
+        double gForce = sqrt((accelX * accelX) + (accelY * accelY) + (accelZ * accelZ)) / gravity;
+
+        if (gForce > threshold)
+        {
+            trigger = true;
+        }
+        else
+        {
             trigger = false;
         }
 
         /* Display the results (acceleration is measured in m/s^2) */
-        Serial.print("\t\tAccel X: ");
-        Serial.print(accelX);
-        Serial.print(" \tY: ");
-        Serial.print(accelY);
-        Serial.print(" \tZ: ");
-        Serial.print(accelZ);
-        Serial.println(" m/s^2 ");
-
-        Serial.print("\t\tG-force: ");
-        Serial.println(gForce);
+        // Serial.print("\t\tAccel X: ");
+        // Serial.print(accelX);
+        // Serial.print(" \tY: ");
+        // Serial.print(accelY);
+        // Serial.print(" \tZ: ");
+        // Serial.print(accelZ);
+        // Serial.println(" m/s^2 ");
+        //
+        // Serial.print("\t\tG-force: ");
+        // Serial.println(gForce);
 
         /* Display the results (rotation is measured in rad/s) */
         // Serial.print("\t\tGyro X: ");
