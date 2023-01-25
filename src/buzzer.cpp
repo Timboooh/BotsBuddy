@@ -6,19 +6,37 @@ const int buzzerPin = 23;
 
 namespace BUZZER
 {
+    bool state = false;
+
     void setup()
     {
         pinMode(buzzerPin, OUTPUT);
+
+        digitalWrite(buzzerPin, HIGH);
     }
 
-    bool update()
+    void update()
     {
-        long now = millis();
-        if(millis()%1000 > 500){
+        if (state)
+        {
+            long now = millis();
+            if (millis() % 1000 > 750)
+            {
+                digitalWrite(buzzerPin, LOW);
+            }
+            else
+            {
+                digitalWrite(buzzerPin, HIGH);
+            }
+        }
+        else
+        {
             digitalWrite(buzzerPin, HIGH);
         }
-        else {
-            digitalWrite(buzzerPin, LOW);
-        }
+    }
+
+    void set(bool on)
+    {
+        state = on;
     }
 }

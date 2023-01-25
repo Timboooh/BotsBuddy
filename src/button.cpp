@@ -2,21 +2,25 @@
 
 #include "button.hpp"
 
-const int buttonPin = 2; // D4 on esp8266
+const int buttonPin = 4; // D4 on esp8266
 
-bool buttonState = false;
 namespace BUTTON
 {
+    bool lastState = false;
+
     void setup()
     {
         pinMode(buttonPin, INPUT_PULLUP);
     }
 
-    bool update()
+    bool get_state()
     {
-        buttonState = digitalRead(buttonPin);
-        Serial.print("button");
-        Serial.println(!buttonState);
-        return (!buttonState);
+        bool buttonState = !digitalRead(buttonPin);
+        if (buttonState && !lastState) {
+            lastState = buttonState;
+            return true;
+        }
+        lastState = buttonState;
+        return false;
     }
 }

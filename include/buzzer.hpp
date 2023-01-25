@@ -4,7 +4,8 @@
 namespace BUZZER
 {
     void setup();
-    bool update();
+    void update();
+    void set(bool on);
 }
 
 #endif

@@ -3,6 +3,8 @@
 #include "accel.hpp"
 #include "oled.hpp"
 #include "a9g.h"
+#include "button.hpp"
+#include "buzzer.hpp"
 
 long lastUpdate = 0;
 
@@ -15,6 +17,8 @@ void setup()
     OLED::setup();
     ACCEL::setup();
     A9G::setup();
+    BUTTON::setup();
+    BUZZER::setup();
     Serial.println("setup done");
 
 }
@@ -27,6 +31,7 @@ void loop()
     {
         lastUpdate = now;
         Serial.printf("state: %d \r\n", state);
+
     }
     switch (state)
     {
@@ -44,9 +49,12 @@ void loop()
         A9G::update();
         OLED::update();
 
+        if (BUTTON::get_state()) trigger = true;
+
         if (trigger) {
             counter = 21;
             state = 2;
+            BUZZER::set(true);
         }
 
         break;
@@ -56,8 +64,18 @@ void loop()
         if (trigger)
             OLED::update();
         if (counter <= 0) {
+            trigger = false;
             state = 3;
+            BUZZER::set(false);
+
         }
+        if (BUTTON::get_state()) {
+            counter = 0;
+            state = 1;
+            trigger = false;
+            BUZZER::set(false);
+        }
+        BUZZER::update();
         break;
     }
     case 3:
@@ -75,21 +93,5 @@ void loop()
         break;
     }
     }
-
-    // long now = millis();
-    // if (trigger == true)
-    // {
-    //     if(OLED::buttonPress() == false){
-    //         if(now - lastUpdate > 1000){
-    //             lastUpdate = now;
-    //             OLED::startCountdown();
-    //         }
-    //     } else {
-    //         counter = 21;
-    //         trigger = false;
-    //     }
-    // } else {
-    //     ACCEL::update();
-    //     Serial.println(trigger);
-    // }
+    delay(10);
 }
