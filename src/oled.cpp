@@ -15,16 +15,10 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 unsigned long previousMillis = 0;
 unsigned long interval = 1000;
 
-
-const int buttonPin = 2;  //D4 on esp8266 
-
-bool buttonState = false;
-
 namespace OLED
 {
     void setup() {
         pinMode(LED_BUILTIN, OUTPUT);
-        pinMode(buttonPin, INPUT_PULLUP);
 
         if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
             Serial.println(F("SSD1306 allocation failed"));
@@ -41,7 +35,7 @@ namespace OLED
 
 
 
-    void startCountdown(){
+    void update(){
         if(counter > 0){
             digitalWrite(LED_BUILTIN, LOW);
             display.clearDisplay();
@@ -52,12 +46,5 @@ namespace OLED
             Serial.println(counter);
             digitalWrite(LED_BUILTIN, HIGH);
         }
-    }
-
-    bool buttonPress(){
-        buttonState = digitalRead(buttonPin);
-        Serial.print("button");
-        Serial.println(!buttonState);
-        return (!buttonState);
     }
 }
