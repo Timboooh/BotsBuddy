@@ -15,7 +15,7 @@ namespace A9G
     bool is_initialized = false;
     bool gps_hasfix = false;
 
-    String location = "";
+    String location = "https://www.google.com/maps/place/51.9172,%204.4842";
 
     void sendCommand(const char *fmt, ...)
     {
@@ -50,11 +50,11 @@ namespace A9G
         if (!strcmp(response.cmd, "GPSRD"))
         {   // $GNGGA,000025.029,5133.4337,N,00431.0019,E,0,0,,6.2,M,47.2,M,,*5D
             String args = response.args;
-            auto latitudeStr = args.substring(18, 20) + " " + args.substring(20, 27);
-            auto longitudeStr = args.substring(30, 33) + " " + args.substring(33, 40);
+            auto latitudeStr = args.substring(18, 20) + "%20" + args.substring(20, 27);
+            auto longitudeStr = args.substring(30, 33) + "%20" + args.substring(33, 40);
             gps_hasfix = (args.charAt(43) != '0');
 
-            location = "https://www.google.com/maps/place/" + latitudeStr + ", " + longitudeStr;
+            location = "https://www.google.com/maps/place/" + latitudeStr + ",%20" + longitudeStr;
             Serial.println("Location: " + location);
             Serial.printf("Has Fix: %d\r\n\r\n", gps_hasfix);
 
@@ -153,11 +153,16 @@ namespace A9G
     }
     void sms_send(const char *phonenumber, String message)
     {
-        Serial.println("Fake SMS has been sent!");
+        Serial.println("SMS has been sent!");
         Serial.println(message);
 
+        char messageBuf[256];
+        message.toCharArray(messageBuf, 256);
+
         // sendCommand("AT+CMGS=\"%s\"", phonenumber);
-        // sendCommand("%s%c", message, 26);
+        // sendCommand("%s%c", messageBuf, 26);
+        Serial.println(messageBuf);
+        delay(200);
     }
     void call_send(const char *phonenumber) { sendCommand("ATD%s", phonenumber); }
     void sim_update() { sendCommand("AT+CPIN?"); }
