@@ -11,8 +11,7 @@ extern int counter;
 namespace OLED
 {
     void setup();
-    void startCountdown();
-    bool buttonPress();
+    void update();
 }
 
 
