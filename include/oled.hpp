@@ -12,6 +12,7 @@ namespace OLED
 {
     void setup();
     void startCountdown();
+    bool buttonPress();
 }
 
 

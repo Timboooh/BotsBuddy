@@ -16,15 +16,15 @@ unsigned long previousMillis = 0;
 unsigned long interval = 1000;
 
 
-const int buttonPin = 4;
+const int buttonPin = 2;  //D4 on esp8266 
 
-int buttonState = 0;
+bool buttonState = false;
 
 namespace OLED
 {
     void setup() {
         pinMode(LED_BUILTIN, OUTPUT);
-        pinMode(buttonPin, INPUT);
+        pinMode(buttonPin, INPUT_PULLUP);
 
         if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
             Serial.println(F("SSD1306 allocation failed"));
@@ -52,5 +52,12 @@ namespace OLED
             Serial.println(counter);
             digitalWrite(LED_BUILTIN, HIGH);
         }
+    }
+
+    bool buttonPress(){
+        buttonState = digitalRead(buttonPin);
+        Serial.print("button");
+        Serial.println(!buttonState);
+        return (!buttonState);
     }
 }
