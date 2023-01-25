@@ -1,19 +1,34 @@
 #include <Arduino.h>
-#include "contacts.h"
-#include "a9g.h"
 
-void setup()
-{
-  delay(5000);
+#include "accel.hpp"
+#include "oled.hpp"
+
+long lastUpdate = 0;
+int counter = 21;
+
+void setup() {
+  // put your setup code here, to run once:
   Serial.begin(115200);
-  Serial.println("Hello world!");
-  
-  A9G::setup();
+  OLED::setup();
+  ACCEL::setup();
+  Serial.println("setup done");
 }
 
-void loop()
-{
-  // Serial.println(CONTACTS::getNextContact());
-  A9G::update();
-  delay(100);
-}
+void loop() {
+    long now = millis();
+    if (trigger == true)
+    {
+        if(OLED::buttonPress() == false){
+            if(now - lastUpdate > 1000){
+                lastUpdate = now;
+                OLED::startCountdown();
+            }
+        } else {
+            counter = 21;
+            trigger = false;
+        }
+    } else {
+        ACCEL::update();
+        Serial.println(trigger);   
+    }
+}   
