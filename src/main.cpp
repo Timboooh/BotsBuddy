@@ -14,11 +14,19 @@ void setup()
 {
     // put your setup code here, to run once:
     Serial.begin(115200);
+
+    BUZZER::setup();
+    for (size_t i = 0; i < 100; i++)
+    {
+        Serial.println("Hello, world!");
+        delay(100);
+    }
+    
+
     OLED::setup();
     ACCEL::setup();
     A9G::setup();
     BUTTON::setup();
-    BUZZER::setup();
     Serial.println("setup done");
 
 }

@@ -2,7 +2,7 @@
 
 #include "button.hpp"
 
-const int buttonPin = 4; // D4 on esp8266
+const int buttonPin = 8; 
 
 namespace BUTTON
 {

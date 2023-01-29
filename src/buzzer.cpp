@@ -2,7 +2,7 @@
 
 #include "buzzer.hpp"
 
-const int buzzerPin = 23;
+const int buzzerPin = 2;
 
 namespace BUZZER
 {

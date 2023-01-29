@@ -25,9 +25,9 @@ namespace A9G
         va_start(arg, fmt);
         vsprintf(s, fmt, arg);
 
-        Serial2.print(s);
+        Serial1.print(s);
         
-        Serial2.println();
+        Serial1.println();
 
         // Serial.println("Sent AT command:");
         // Serial.print("\t ");
@@ -65,7 +65,7 @@ namespace A9G
     {
         // The A9G chip is connected to UART2 of the microcontroller.
         // And uses a baudrate of 115200
-        Serial2.begin(115200);
+        Serial1.begin(115200, SERIAL_8N1, 9, 10);
 
         reset();
     }
@@ -98,12 +98,12 @@ namespace A9G
         }
 
         // Parse the UART data coming back from the A9g
-        while (Serial2.available())
+        while (Serial1.available())
         {
             // Start with reading entire lines at once
-            // If haven´t received the full string yet, we wait until Serial2.getTimeout() has been reached.
+            // If haven´t received the full string yet, we wait until Serial1.getTimeout() has been reached.
             // This defaults to 1000ms.
-            String rx = Serial2.readStringUntil('\n');
+            String rx = Serial1.readStringUntil('\n');
             rx.trim(); // get rid of messy spaces or carriage returns
 
             // Serial.println("A9G: " + rx);

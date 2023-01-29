@@ -21,7 +21,7 @@ namespace OLED
 {
     void setup()
     {
-        pinMode(LED_BUILTIN, OUTPUT);
+        //pinMode(LED_BUILTIN, OUTPUT);
 
         if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
         { // Address 0x3D for 128x64
@@ -47,14 +47,14 @@ namespace OLED
             if (counter > 0)
             {
                 lastUpdate = now;
-                digitalWrite(LED_BUILTIN, LOW);
+                //digitalWrite(LED_BUILTIN, LOW);
                 display.clearDisplay();
                 display.setCursor(5, 5);
                 counter--;
                 display.println(counter);
                 display.display();
                 Serial.println(counter);
-                digitalWrite(LED_BUILTIN, HIGH);
+                //digitalWrite(LED_BUILTIN, HIGH);
             }
             else
             {
