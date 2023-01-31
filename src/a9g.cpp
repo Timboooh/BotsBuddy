@@ -14,6 +14,8 @@ namespace A9G
 
     bool is_initialized = false;
     bool gps_hasfix = false;
+    bool in_call = false;
+    bool is_ringing = false;
 
     String location = "https://www.google.com/maps/place/51.9172,%204.4842";
 
@@ -26,13 +28,13 @@ namespace A9G
         vsprintf(s, fmt, arg);
 
         Serial1.print(s);
-        
+
         Serial1.println();
 
-        // Serial.println("Sent AT command:");
-        // Serial.print("\t ");
-        // Serial.print(s);
-        // Serial.println();
+        Serial.println("Sent AT command:");
+        Serial.print("\t ");
+        Serial.print(s);
+        Serial.println();
 
         va_end(arg);
 
@@ -41,14 +43,14 @@ namespace A9G
 
     void parseCommand(struct Response response)
     {
-        // Serial.println("Got response: ");
-        // Serial.print("  cmd:\t ");
-        // Serial.println(response.cmd);
-        // Serial.print("  args:\t ");
-        // Serial.println(response.args);
+        Serial.println("Got response: ");
+        Serial.print("  cmd:\t ");
+        Serial.println(response.cmd);
+        Serial.print("  args:\t ");
+        Serial.println(response.args);
 
         if (!strcmp(response.cmd, "GPSRD"))
-        {   // $GNGGA,000025.029,5133.4337,N,00431.0019,E,0,0,,6.2,M,47.2,M,,*5D
+        { // $GNGGA,000025.029,5133.4337,N,00431.0019,E,0,0,,6.2,M,47.2,M,,*5D
             String args = response.args;
             auto latitudeStr = args.substring(18, 20) + "%20" + args.substring(20, 27);
             auto longitudeStr = args.substring(30, 33) + "%20" + args.substring(33, 40);
@@ -57,7 +59,18 @@ namespace A9G
             location = "https://www.google.com/maps/place/" + latitudeStr + ",%20" + longitudeStr;
             Serial.println("Location: " + location);
             Serial.printf("Has Fix: %d\r\n\r\n", gps_hasfix);
+        }
 
+        if (!strcmp(response.cmd, "CIEV"))
+        {
+            if (!strcmp(response.args, " \"SOUNDER\",1"))
+                Serial.println("A9G: Sounder 1");
+            else if (!strcmp(response.args, " \"SOUNDER\",0"))
+                Serial.println("A9G: Sounder 0");
+            else if (!strcmp(response.args, " \"CALL\",1"))
+                Serial.println("A9G: Call 1");
+            else if (!strcmp(response.args, " \"CALL\",0"))
+                Serial.println("A9G: Call 0");
         }
     }
 
@@ -137,7 +150,7 @@ namespace A9G
         }
     }
 
-    bool is_init() {return is_initialized; }
+    bool is_init() { return is_initialized; }
     bool gps_getHasfix() { return gps_hasfix; }
     String gps_getLocationURL() { return location; }
 
@@ -159,8 +172,8 @@ namespace A9G
         char messageBuf[256];
         message.toCharArray(messageBuf, 256);
 
-        // sendCommand("AT+CMGS=\"%s\"", phonenumber);
-        // sendCommand("%s%c", messageBuf, 26);
+        sendCommand("AT+CMGS=\"%s\"", phonenumber);
+        sendCommand("%s%c", messageBuf, 26);
         Serial.println(messageBuf);
         delay(200);
     }
