@@ -65,7 +65,7 @@ namespace A9G
     {
         // The A9G chip is connected to UART2 of the microcontroller.
         // And uses a baudrate of 115200
-        Serial1.begin(115200, SERIAL_8N1, 9, 10);
+        Serial1.begin(115200, SERIAL_8N1, 2, 3);
 
         reset();
     }
