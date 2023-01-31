@@ -92,6 +92,7 @@ void loop()
         String message = "EMERGENCY ALERT MESSAGE\r\nThis person has been in an collision.\r\n" + locationURL;
         
         A9G::sms_send("+31623379877", message);
+        A9G::call_send("+31623379877");
 
         state = 1;
         break;
